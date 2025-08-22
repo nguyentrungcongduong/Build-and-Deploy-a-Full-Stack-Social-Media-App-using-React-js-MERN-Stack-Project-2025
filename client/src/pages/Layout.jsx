@@ -3,11 +3,10 @@ import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
 import { dummyUserData } from "../assets/assets";
 import Loading from "../components/Loading";
+import { Menu, X } from 'lucide-react';
 const Layout = () => {
   const user = dummyUserData;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-
   return user ?  (
     <div className="w-full flex h-screen">
       <Sidebar></Sidebar>
