@@ -6,8 +6,8 @@ export const inngest = new Inngest({ id: "my-app" });
 
 //Inngest Funtions to save user data to be a database
 const syncUserCreation = inngest.createFunction(
-  { id: "synv-user-with-clerk" },
-  { event: "clerk/user.deleted" },
+  { id: "sync-user-from-clerk" },
+  { event: "clerk/user.created" },
   async ({ event }) => {
     const { id, first_name, last_name, email_addresses, image_url } =
       event.data;
@@ -16,7 +16,7 @@ const syncUserCreation = inngest.createFunction(
     //Check  avaiable of username
     const user = await User.findOne({ username });
     if (user) {
-      username = username + Math.floor(Math.random() + 10000);
+      username = username + Math.floor(Math.random() * 10000);
     }
 
     const userData = {
@@ -26,9 +26,11 @@ const syncUserCreation = inngest.createFunction(
       profile_picture: image_url,
       username,
     };
-    await User.Create(userData);
+    await User.create(userData);
   }
 );
+
+
 // Inngest Function to update user data in databaase
 const syncUserUpdation = inngest.createFunction(
   { id: "update-user-from-clerk" },
@@ -49,12 +51,11 @@ const syncUserUpdation = inngest.createFunction(
 
 // Inngest Function to update user data in databaase
 const syncUserDeletion = inngest.createFunction(
-  { id: "delete-user-from-clerk" },
-  { event: "clerk/user.updated" },
+  { id: "delete-user-with-clerk" },
+  { event: "clerk/user.deleted" },
   async ({ event }) => {
     const { id } = event.data;
     await User.findByIdAndDelete(id)
-
   }
 );
 
