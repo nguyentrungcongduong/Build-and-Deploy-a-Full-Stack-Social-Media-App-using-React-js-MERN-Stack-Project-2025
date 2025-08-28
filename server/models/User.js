@@ -1,4 +1,5 @@
-import mongoose, { Connection, mongo } from "mongoose";
+// import mongoose, { Connection, mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const userShema = new mongoose.Schema({
   _id: { type: String, required: true },
