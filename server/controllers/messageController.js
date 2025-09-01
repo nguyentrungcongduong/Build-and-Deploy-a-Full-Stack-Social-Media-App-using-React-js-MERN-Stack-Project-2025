@@ -1,6 +1,6 @@
 import fs from "fs"; // cho phép làm việc với file ,thư mục
 import imagekit from "../configs/imageKit.js";
-import Message from "../models/Message";
+import Message from "../models/Message.js";
 import { create } from "domain";
 
 //Create an empty object to store SS event connections
@@ -119,7 +119,4 @@ export const getUserRecentMessages = async (req, res) => {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
-};
-
-// 《牵丝戏》
-// 银临/Aki阿杰
+}

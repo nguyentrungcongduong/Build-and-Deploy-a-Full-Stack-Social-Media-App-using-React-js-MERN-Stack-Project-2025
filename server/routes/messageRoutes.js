@@ -1,7 +1,7 @@
 import express from "express";
-import { getChatMessages, sendMessage, sseControler } from "../controllers/messageController";
-import { upload } from "../configs/multer";
-import { protect } from "../middlewares/auth";
+import { getChatMessages, sendMessage, sseControler } from "../controllers/messageController.js";
+import { upload } from "../configs/multer.js";
+import { protect } from "../middlewares/auth.js";
 
 
 
