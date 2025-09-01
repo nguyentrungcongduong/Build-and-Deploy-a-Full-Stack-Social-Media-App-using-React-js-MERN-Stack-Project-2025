@@ -55,7 +55,7 @@ export const getFeedPosts = async (req, res) => {
     const user = await User.findById(userId);
 
     //User connection and followings
-    const userIds = [userId, ...user.collections, ...user.following];
+    const userIds = [userId, ...user.connections, ...user.following];
     const posts = await Post.find({ user: { $in: userIds } })
       .populate("user")
       .sort({
