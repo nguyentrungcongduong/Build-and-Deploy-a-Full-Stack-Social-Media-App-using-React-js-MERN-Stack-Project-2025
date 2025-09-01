@@ -72,24 +72,54 @@
 
 // export default ProfileModal;
 import React, { useState } from "react";
-import { dummyUserData } from "../assets/assets";
 import { Pencil } from "lucide-react"; // ✅ thêm import
+import { useSelector, useDispatch } from "react-redux";
+import { updateUser } from "../features/user/userSlice.js";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
 
-const ProfileModal = ({setShowEdit}) => {
-  const user = dummyUserData;
+const ProfileModal = ({ setShowEdit }) => {
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.user.value);
+  const { getToken } = useAuth();
+
   const [editForm, setEditForm] = useState({
     username: user.username,
     bio: user.bio,
     location: user.location,
     profile_picture: null,
     cover_photo: null,
-
     full_name: user.full_name,
   });
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
-    // TODO: save profile logic
+    try {
+      const userData = new FormData();
+      const {
+        full_name,
+        username,
+        bio,
+        location,
+        profile_picture,
+        cover_photo,
+      } = editForm;
+
+      userData.append("username", username);
+      userData.append("bio", bio);
+      userData.append("location", location);
+      userData.append("full_name", full_name);
+      profile_picture && userData.append("profile", profile_picture);
+      cover_photo && userData.append("cover", cover_photo);
+
+      const token = await getToken();
+      dispatch(updateUser({ userData, token }));
+
+      setShowEdit(false);
+    } catch (error) {
+      toast.error(error);
+    }
   };
 
   return (
@@ -101,7 +131,12 @@ const ProfileModal = ({setShowEdit}) => {
           </h1>
 
           {/* ✅ form bao quanh toàn bộ */}
-          <form className="space-y-4" onSubmit={handleSaveProfile}>
+          <form
+            className="space-y-4"
+            onSubmit={
+              (e) =>toast.promise(handleSaveProfile(e), { loading: "Saving..." })
+            }
+          >
             {/* Profile Picture */}
             <div className="flex flex-col items-start gap-3">
               <label
@@ -299,16 +334,14 @@ const ProfileModal = ({setShowEdit}) => {
 
             <div className="flex justify-end space-x-3 pt-6">
               <button
-              onClick={()=>setShowEdit(false)}
+                onClick={() => setShowEdit(false)}
                 type="button"
                 className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors "
               >
                 Cancel
               </button>
 
-
-
-                <button
+              <button
                 type="button"
                 className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition cursor-pointer"
               >
