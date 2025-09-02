@@ -2,8 +2,11 @@ import React from "react";
 import { Eye, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+
 const Messages = () => {
   const {connections} = useSelector((state)=> state.connections)
+  
    const navigate = useNavigate();
 
   return (

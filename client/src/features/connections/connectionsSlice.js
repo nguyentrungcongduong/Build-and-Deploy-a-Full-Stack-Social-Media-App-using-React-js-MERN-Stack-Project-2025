@@ -9,7 +9,7 @@ const initialState = {
 };
 
 export const fetchConnections = createAsyncThunk(
-  "connections/fetchConnections",
+  'connections/fetchConnections',
   async (token) => {
     const { data } = await api.get("/api/user/connections", {
       headers: { Authorization: `Bearer ${token}` },
@@ -18,7 +18,7 @@ export const fetchConnections = createAsyncThunk(
   }
 );
 
-const connectionSlice = createSlice({
+const connectionsSlice = createSlice({
   name: "connections",
   initialState,
   reducers: {
@@ -36,4 +36,4 @@ const connectionSlice = createSlice({
   }
 });
 
-export default connectionSlice.reducer;
+export default connectionsSlice.reducer;

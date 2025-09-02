@@ -55,7 +55,7 @@ const Connections = () => {
 const acceptConnection = async (userId) => {
     try {
       const { data } = await api.post(
-        "/api/user/accept",
+        '/api/user/accept',
         { id: userId },
         {
           headers: { Authorization: `Bearer ${await getToken()}` },
@@ -159,7 +159,7 @@ const acceptConnection = async (userId) => {
                     {currentTab === "Following" && (
                       <button onClick={()=> handleUnfollow(user._id)} className="w-full p-2 text-sm rounded bg-slate-100 hover:bg-slate-200 text-black active:scale-95 transition cursor-pointer">
                         Unfollow
-                      </button>
+                      </button> 
                     )}
 
                     {currentTab === "Pending" && (

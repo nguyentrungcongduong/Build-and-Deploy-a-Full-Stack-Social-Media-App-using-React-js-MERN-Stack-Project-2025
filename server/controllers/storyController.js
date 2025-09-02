@@ -2,6 +2,8 @@ import fs from "fs"; // cho phép làm việc với file ,thư mục
 import imagekit from "../configs/imageKit.js";
 import Story from "../models/Story.js";
 import User from "../models/User.js";
+import { inngest } from "../inngest/index.js";
+
 
 //add User Story
 export const addUserStory = async (req, res) => {

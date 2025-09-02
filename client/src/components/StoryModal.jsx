@@ -29,12 +29,14 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.type.startsWith("video")) {
+
         if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
           toast.error(`Video file size cannot exceed ${MAX_VIDEO_SIZE_MB}MB.`);
           setMedia(null);
           setPreviewUrl(null);
           return;
         }
+
         const video = document.createElement("video");
         video.preload = "metadata";
         video.onloadedmetadata = () => {
@@ -78,6 +80,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
     formData.append("background_color", background);
 
     const token = await getToken();
+
     try {
       const { data } = await api.post("/api/story/create", formData, {
         headers: { Authorization: `Bearer ${token}` },
@@ -185,7 +188,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
         <button
           onClick={() =>
             toast.promise(handleCreateStory(), {
-              loading: "Saving...",              
+              loading: "Saving...", 
             })
           }
           className="flex items-center justify-center gap-2 text-white py-3 mt-4 w-full rounded bg-gradient-to-r from-indigo-500 to-purple-600

@@ -7,7 +7,7 @@ import { protect } from "../middlewares/auth.js";
 
 const messageRouter =express.Router();
 
-messageRouter.get('/userId',sseControler)
+messageRouter.get('/:userId',sseControler)
 messageRouter.post('/send',upload.single('image'),protect,sendMessage)
 messageRouter.post('/get',protect,getChatMessages)
 

@@ -39,7 +39,7 @@ const PostCard = ({ post }) => {
       }
     } catch (error) {
       toast.error(error.message);
-    }
+    } 
   };
 
   const navigate = useNavigate();

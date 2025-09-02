@@ -21,7 +21,7 @@ const Discover = () => {
         setLoading(true);
 
         const { data } = await api.post(
-          "/api/user/discover",
+          '/api/user/discover',
           { input },
           {
             headers: { Authorization: `Bearer ${await getToken()}` },

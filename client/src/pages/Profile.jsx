@@ -23,6 +23,7 @@ const Profile = () => {
 
   const fetchUser = async (profileId) => {
     const token = await getToken();
+    
     try {
       const { data } = await api.post(
         `/api/user/profiles`,

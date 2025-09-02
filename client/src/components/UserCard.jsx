@@ -1,5 +1,4 @@
 import React from "react";
-// import { dummyUserData } from "../assets/assets";
 import { MapPin, MessageCircle, UserPlus, Plus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +8,6 @@ import toast from "react-hot-toast";
 import { fetchUser } from "../features/user/userSlice";
 
 const UserCard = ({ user }) => {
-  // const currentUser = dummyUserData;
   const currentUser = useSelector((state) => state.user.value);
   const { getToken } = useAuth();
   const dispatch = useDispatch();
@@ -35,14 +33,16 @@ const UserCard = ({ user }) => {
       toast.error(error.message);
     }
   };
+
+
   const handleConnectionRequest = async () => {
     if (currentUser.connections.includes(user._id)) {
-      return navigate("/messages/" + user._id);
+      return navigate('/messages/' + user._id);
     }
 
     try {
       const { data } = await api.post(
-        "/api/user/connect",
+        '/api/user/connect',
         { id: user._id },
         {
           headers: { Authorization: `Bearer ${await getToken()}` },

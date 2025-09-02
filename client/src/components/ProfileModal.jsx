@@ -133,8 +133,8 @@ const ProfileModal = ({ setShowEdit }) => {
           {/* ✅ form bao quanh toàn bộ */}
           <form
             className="space-y-4"
-            onSubmit={
-              (e) =>toast.promise(handleSaveProfile(e), { loading: "Saving..." })
+            onSubmit={(e) =>
+              toast.promise(handleSaveProfile(e), { loading: "Saving..." })
             }
           >
             {/* Profile Picture */}
@@ -242,7 +242,6 @@ const ProfileModal = ({ setShowEdit }) => {
                 Save Profile
               </button>
             </div>
-
             {/* Cover Photo */}
             <div className="flex flex-col items-start gap-3">
               <label
@@ -250,32 +249,35 @@ const ProfileModal = ({ setShowEdit }) => {
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Cover Photo
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  id="profile_picture"
-                  className="w-full p-3 border border-gray-200 rounded-lg"
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, cover_photo: e.target.files[0] })
-                  }
-                />
-                <div>
-                  <img
-                    src={
-                      editForm.cover_photo
-                        ? URL.createObjectURL(editForm.cover_photo)
-                        : user.cover_photo
-                    }
-                    alt=""
-                    className="w-80 h-40 rounded-lg bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 object-cover mt-2"
-                  />
-
-                  <div className="absolute hidden group-hover/cover:flex top-0 left-0 right-0 bg-black/20 rounded-lg items-center justify-center ">
-                    <Pencil className="w-5 h-5 text-white"></Pencil>
-                  </div>
-                </div>
               </label>
+
+              <input
+                hidden
+                type="file"
+                accept="image/*"
+                id="cover_photo" // ✅ id phải khớp
+                onChange={(e) =>
+                  setEditForm({ ...editForm, cover_photo: e.target.files[0] })
+                }
+              />
+
+              <div className="group/cover relative w-80 h-40 mt-2">
+                <img
+                  src={
+                    editForm.cover_photo
+                      ? URL.createObjectURL(editForm.cover_photo)
+                      : user.cover_photo
+                  }
+                  alt="cover preview"
+                  className="w-full h-full rounded-lg bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 object-cover"
+                />
+
+                <div className="absolute hidden group-hover/cover:flex top-0 left-0 right-0 bottom-0 bg-black/20 rounded-lg items-center justify-center cursor-pointer">
+                  <label htmlFor="cover_photo" className="cursor-pointer">
+                    <Pencil className="w-6 h-6 text-white" />
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -343,6 +345,7 @@ const ProfileModal = ({ setShowEdit }) => {
 
               <button
                 type="button"
+                onClick={handleSaveProfile}
                 className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition cursor-pointer"
               >
                 Save Change

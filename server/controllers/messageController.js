@@ -18,7 +18,9 @@ export const sseControler = (req, res) => {
 
   // add the client's response object to the connections objects
   connections[userId] = res;
+   res.write('log: Connected tto SSE stream\n\n');
 
+   
   //handle client disconnection
   res.on("close", () => {
     //Remove the client's response object from the connections array
