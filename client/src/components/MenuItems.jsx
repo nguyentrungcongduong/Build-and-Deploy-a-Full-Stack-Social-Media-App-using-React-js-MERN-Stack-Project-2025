@@ -1,5 +1,5 @@
 import React from 'react'
-import { menuItemsData } from '../assets/assets'
+import { menuItemsData } from '../assets/assets.js'
 import { NavLink } from 'react-router-dom'
 
 const MenuItems = ({setSidebarOpen}) => {

@@ -13,10 +13,10 @@ import Layout from './pages/Layout'
 import toast, {Toaster} from 'react-hot-toast'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { fetchUser } from './features/user/userSlice'
-import { fetchConnections } from './features/connections/connectionsSlice'
-import { addMessage } from './features/messages/messagesSlice'
-import Notification from './components/Notification'
+import { fetchUser } from './features/user/userSlice.js'
+import { fetchConnections } from './features/connections/connectionsSlice.js'
+import { addMessage } from './features/messages/messagesSlice.js'
+import Notification from './components/Notification.jsx'
 
 const App = () => {
   const {user} = useUser()

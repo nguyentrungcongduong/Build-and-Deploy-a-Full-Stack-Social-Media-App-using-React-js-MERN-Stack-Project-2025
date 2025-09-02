@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { dummyConnectionsData } from '../assets/assets'
 import { Search } from 'lucide-react'
-import UserCard from '../components/UserCard'
-import Loading from '../components/Loading'
+import UserCard from '../components/UserCard.jsx'
+import Loading from '../components/Loading.jsx'
 import api from '../api/axios'
 import { useAuth } from '@clerk/clerk-react'
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
-import { fetchUser } from '../features/user/userSlice'
+import { fetchUser } from '../features/user/userSlice.js'
 
 const Discover = () => {
 
