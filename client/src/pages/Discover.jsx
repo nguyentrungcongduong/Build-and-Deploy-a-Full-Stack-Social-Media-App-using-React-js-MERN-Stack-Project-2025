@@ -8,37 +8,40 @@ import { useDispatch } from "react-redux";
 import { fetchUser } from "../features/user/userSlice.js";
 
 const Discover = () => {
-
-  const dispatch =useDispatch()
+  const dispatch = useDispatch();
   const [input, setInput] = useState("");
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const {getToken} =useAuth()
+  const { getToken } = useAuth();
 
   const handleSearch = async (e) => {
     if (e.key === "Enter") {
       try {
         setUsers([]);
         setLoading(true);
-        const { data } = await api.post('/api/user/discover',{input},{
-          headers:{Authorization : `Bearer ${await getToken()}`}
-        });
-        data.success ? setUsers(data.users) : toast.error(data.message)
-         setLoading(false)
-         setInput('')
+
+        const { data } = await api.post(
+          "/api/user/discover",
+          { input },
+          {
+            headers: { Authorization: `Bearer ${await getToken()}` },
+          }
+        );
+        data.success ? setUsers(data.users) : toast.error(data.message);
+        setLoading(false);
+        setInput("");
       } catch (error) {
         toast.error(error.message);
       }
-      setLoading(false)
+      setLoading(false);
     }
   };
 
-
-  useEffect(()=>{
-getToken().then((token)=>{
-  dispatch(fetchUser(token))
-})
-  },[])
+  useEffect(() => {
+    getToken().then((token) => {
+      dispatch(fetchUser(token));
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white ">

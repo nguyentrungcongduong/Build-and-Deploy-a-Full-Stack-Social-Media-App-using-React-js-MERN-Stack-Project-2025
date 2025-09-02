@@ -285,7 +285,6 @@ export const getUserConnections = async (req, res) => {
 };
 
 //accept Connection Request
-
 export const acceptConnectionRequest = async (req, res) => {
   try {
     const { userId } = req.auth;

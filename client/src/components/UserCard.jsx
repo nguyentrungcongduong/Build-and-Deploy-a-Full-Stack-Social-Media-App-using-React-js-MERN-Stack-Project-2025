@@ -24,6 +24,7 @@ const UserCard = ({ user }) => {
           headers: { Authorization: `Bearer ${await getToken()}` },
         }
       );
+
       if (data.success) {
         toast.success(data.message);
         dispatch(fetchUser(await getToken()));
@@ -53,7 +54,7 @@ const UserCard = ({ user }) => {
         toast.error(data.message);
       }
     } catch (error) {
-              toast.error(error.message);
+      toast.error(error.message);
     }
   };
 

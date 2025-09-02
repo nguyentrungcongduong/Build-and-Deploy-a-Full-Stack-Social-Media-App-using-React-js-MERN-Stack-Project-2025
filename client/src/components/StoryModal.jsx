@@ -21,6 +21,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
 
   const { getToken } = useAuth();
+  
   const MAX_VIDEO_DURATION = 60; //seconds
   const MAX_VIDEO_SIZE_MB = 50; //MB
 
@@ -184,7 +185,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
         <button
           onClick={() =>
             toast.promise(handleCreateStory(), {
-              loading: "Saving...",             
+              loading: "Saving...",              
             })
           }
           className="flex items-center justify-center gap-2 text-white py-3 mt-4 w-full rounded bg-gradient-to-r from-indigo-500 to-purple-600

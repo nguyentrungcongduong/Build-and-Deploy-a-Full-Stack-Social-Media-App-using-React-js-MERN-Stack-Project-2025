@@ -8,8 +8,8 @@ import messagesReducer from '../features/messages/messagesSlice.js'
 
 export const store = configureStore({
     reducer:{
-      user:userReducer,
+      user: userReducer,
       connections: connectionsReducer,
-      message: messagesReducer
+      messages: messagesReducer
     }
 });

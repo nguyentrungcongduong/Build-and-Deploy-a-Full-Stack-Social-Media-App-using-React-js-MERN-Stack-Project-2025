@@ -7,7 +7,7 @@ const initialState = {
 }
 
 // /api/user/data"
-export const fetchUser = createAsyncThunk("/user/fetchUser", async (token) => {
+export const fetchUser = createAsyncThunk("user/fetchUser", async (token) => {
   const { data } = await api.get("/api/user/data", {
     headers: { Authorization: ` Bearer ${token}` },
   });
@@ -15,7 +15,7 @@ export const fetchUser = createAsyncThunk("/user/fetchUser", async (token) => {
 });
 
 export const updateUser = createAsyncThunk(
-  "/user/update",
+  "user/update",
   async ({ userData, token }) => {
     const { data } = await api.post("/api/user/update", userData, {
       headers: { Authorization: ` Bearer ${token}` },

@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState,  } from "react";
+// useCallback
 import { Link, useParams } from "react-router-dom";
 import UserProfileInfo from "../components/UserProfileInfo";
 import PostCard from "../components/PostCard";
@@ -20,68 +21,67 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
 
-  // const fetchUser = async (profileId) => {
-  //   const token = await getToken();
-
-  //   try {
-  //     const { data } = await api.post(
-  //       `/api/user/profiles`,
-  //       { profileId },
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     if (data.success) {
-  //       setUser(data.profile);
-  //       setPosts(data.posts);
-  //     } else {
-  //       toast.error(data.message);
-  //     }
-  //   } catch (error) {
-  //     toast.error(error.message);
-  //   }
-
-  // };
-
-  // useEffect(() => {
-  //   if (profileId) {
-  //     fetchUser(profileId);
-  //   } else {
-  //     fetchUser(currentUser._id);
-  //   }
-  // }, [profileId, currentUser]);
-
-  const fetchUser = useCallback(
-    async (profileId) => {
-      const token = await getToken();
-      try {
-        const { data } = await api.post(
-          `/api/user/profiles`,
-          { profileId },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        if (data.success) {
-          setUser(data.profile);
-          setPosts(data.posts);
-        } else {
-          toast.error(data.message);
+  const fetchUser = async (profileId) => {
+    const token = await getToken();
+    try {
+      const { data } = await api.post(
+        `/api/user/profiles`,
+        { profileId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-      } catch (error) {
-        toast.error(error.message);
+      );
+      if (data.success) {
+        setUser(data.profile);
+        setPosts(data.posts);
+      } else {
+        toast.error(data.message);
       }
-    },
-    [getToken]
-  );
+    } catch (error) {
+      toast.error(error.message);
+    }
+
+  };
 
   useEffect(() => {
     if (profileId) {
       fetchUser(profileId);
-    } else if (currentUser?._id) {
+    } else {
       fetchUser(currentUser._id);
     }
-  }, [profileId, currentUser, fetchUser]);
+  }, [profileId, currentUser]);
+
+  // const fetchUser = useCallback(
+  //   async (profileId) => {
+  //     const token = await getToken();
+  //     try {
+  //       const { data } = await api.post(
+  //         `/api/user/profiles`,
+  //         { profileId },
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //       if (data.success) {
+  //         setUser(data.profile);
+  //         setPosts(data.posts);
+  //       } else {
+  //         toast.error(data.message);
+  //       }
+  //     } catch (error) {
+  //       toast.error(error.message);
+  //     }
+  //   },
+  //   [getToken]
+  // );
+
+  // useEffect(() => {
+  //   if (profileId) {
+  //     fetchUser(profileId);
+  //   } else if (currentUser?._id) {
+  //     fetchUser(currentUser._id);
+  //   }
+  // }, [profileId, currentUser, fetchUser]);
 
   return user ? (
     <div className="relative h-full overflow-y-scroll bg-gray-50 p-6">

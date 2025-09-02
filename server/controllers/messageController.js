@@ -1,7 +1,6 @@
 import fs from "fs"; // cho phép làm việc với file ,thư mục
 import imagekit from "../configs/imageKit.js";
 import Message from "../models/Message.js";
-import { create } from "domain";
 
 //Create an empty object to store SS event connections
 const connections = {};
@@ -14,7 +13,7 @@ export const sseControler = (req, res) => {
   //Set SSE headers
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep/alive");
+  res.setHeader("Connection", "keep-alive");
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   // add the client's response object to the connections objects
@@ -62,7 +61,7 @@ export const sendMessage = async (req, res) => {
       message_type,
       media_url,
     });
-    res.jon({ success: true, message });
+    res.json({ success: true, message });
 
     //Send message to to_user_id using Sse
     const messageWithUserData = await Message.findById(message._id).populate(
@@ -81,7 +80,6 @@ export const sendMessage = async (req, res) => {
 };
 
 //Get chat messages
-
 export const getChatMessages = async (req, res) => {
   try {
     const { userId } = req.auth;
@@ -110,13 +108,17 @@ export const getChatMessages = async (req, res) => {
 export const getUserRecentMessages = async (req, res) => {
   try {
     const { userId } = req.auth;
-    const messages = await Message.find(
-      { to_user_id: userId }.populate("from_user_id to_user_id")
-    ).sort({ created_at: -1 });
+    // const messages = await Message.find(
+    //   { to_user_id: userId }.populate("from_user_id to_user_id")
+    // ).sort({ created_at: -1 });
+
+    const messages = await Message.find({ to_user_id: userId })
+      .populate('from_user_id to_user_id')
+      .sort({ created_at: -1 });
 
     res.json({ success: true, messages });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
-}
+};

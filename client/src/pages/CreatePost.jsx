@@ -7,8 +7,9 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
+
   const navigate = useNavigate()
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState('');
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +39,7 @@ const CreatePost = () => {
       });
 
       const { data } = await api.post("/api/post/add", formData, {
-        headers: { Authorization: `Bearer ${await getToken()}` },
+        headers: { Authorization: `Bearer ${await getToken()}` }
       });
 
       if (data.success) {
