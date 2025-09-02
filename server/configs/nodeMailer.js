@@ -19,3 +19,7 @@ const sendEmail = async ({ to, subject, body }) => {
   });
   return response;
 };
+
+
+
+export default sendEmail;   
