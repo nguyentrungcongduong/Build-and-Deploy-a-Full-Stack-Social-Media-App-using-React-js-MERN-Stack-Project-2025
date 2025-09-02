@@ -8,6 +8,7 @@ import Connections from './pages/Connections'
 import Discover from './pages/Discover'
 import Profile from './pages/Profile'
 import CreatePost from './pages/CreatePost'
+import PublicPost from './pages/PublicPost'
 import { useUser, useAuth } from '@clerk/clerk-react'
 import Layout from './pages/Layout'
 import toast, { Toaster } from 'react-hot-toast'
@@ -32,11 +33,20 @@ const App = () => {
         const token = await getToken()
         dispatch(fetchUser(token))
         dispatch(fetchConnections(token))
+        try {
+          const redirectPostId = localStorage.getItem('redirectPostId')
+          if (redirectPostId) {
+            localStorage.removeItem('redirectPostId')
+            if (pathname !== '/') {
+              window.history.replaceState({}, '', '/')
+            }
+          }
+        } catch { /* ignore */ }
       }
     }
     fetchData()
 
-  }, [user, getToken, dispatch])
+  }, [user, getToken, dispatch, pathname])
 
   useEffect(() => {
     pathnameRef.current = pathname
@@ -77,6 +87,7 @@ const App = () => {
           <Route path='profile/:profileId' element={<Profile />} />
           <Route path='create-post' element={<CreatePost />} />
         </Route>
+        <Route path='post/:postId' element={<PublicPost />} />
       </Routes>
     </>
   )

@@ -3,20 +3,30 @@ import { BadgeCheck, Heart, MessageCircle, Share2 } from 'lucide-react'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux';
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth, useUser } from '@clerk/clerk-react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, onLiked, requireAuth = false }) => {
 
     const postWithHashtags = (post?.content || '').replace(/(#\w+)/g, '<span class="text-indigo-600">$1</span>')
     const [likes, setLikes] = useState(Array.isArray(post?.likes_count) ? post.likes_count : [])
     const currentUser = useSelector((state) => state.user.value)
+    const [commenting, setCommenting] = useState(false)
+    const [commentText, setCommentText] = useState('')
+    const [comments, setComments] = useState(Array.isArray(post?.comments) ? post.comments : [])
 
     const { getToken } = useAuth()
+    const { isSignedIn } = useUser()
 
     const handleLike = async () => {
         if (!post?._id) return
+        if (requireAuth && !isSignedIn) {
+            toast.error('Please log in to like this post')
+            try { localStorage.setItem('redirectPostId', post._id) } catch { /* ignore */ }
+            navigate('/')
+            return
+        }
         try {
             const { data } = await api.post(`/api/post/like`, { postId: post._id }, { headers: { Authorization: `Bearer ${await getToken()}` } })
 
@@ -33,8 +43,34 @@ const PostCard = ({ post }) => {
                         return [...prev, userId]
                     }
                 })
+                onLiked && onLiked()
             } else {
                 toast(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const handleAddComment = async () => {
+        if (requireAuth && !isSignedIn) {
+            toast.error('Please log in to comment')
+            try { localStorage.setItem('redirectPostId', post._id) } catch { /* ignore */ }
+            navigate('/')
+            return
+        }
+        if (!post?._id) return
+        const text = commentText.trim()
+        if (!text) return
+        try {
+            const { data } = await api.post(`/api/post/comment`, { postId: post._id, text }, { headers: { Authorization: `Bearer ${await getToken()}` } })
+            if (data.success) {
+                setComments(data.comments)
+                setCommentText('')
+                toast.success('Comment added')
+                onLiked && onLiked()
+            } else {
+                toast.error(data.message)
             }
         } catch (error) {
             toast.error(error.message)
@@ -79,14 +115,48 @@ const PostCard = ({ post }) => {
                     <span>{likes.length}</span>
                 </div>
                 <div className='flex items-center gap-1'>
-                    <MessageCircle className="w-4 h-4" />
-                    <span>{12}</span>
+                    <MessageCircle className="w-4 h-4 cursor-pointer" onClick={() => {
+                        if (requireAuth && !isSignedIn) {
+                            toast.error('Please log in to comment')
+                            try { localStorage.setItem('redirectPostId', post._id) } catch { /* ignore */ }
+                            navigate('/')
+                            return
+                        }
+                        setCommenting(prev => !prev)
+                    }} />
+                    <span>{comments.length}</span>
                 </div>
                 <div className='flex items-center gap-1'>
-                    <Share2 className="w-4 h-4" />
-                    <span>{7}</span>
+                    <Share2 className="w-4 h-4 cursor-pointer" onClick={() => {
+                        if (requireAuth && !isSignedIn) {
+                            toast.error('Please log in to share')
+                            try { localStorage.setItem('redirectPostId', post._id) } catch { /* ignore */ }
+                            navigate('/')
+                            return
+                        }
+                        const publicUrl = `${window.location.origin}/post/${post._id}`
+                        navigator.clipboard.writeText(publicUrl)
+                        toast.success('Post link copied to clipboard')
+                    }} />
                 </div>
 
+                {commenting && (
+                    <div className='pt-2 space-y-3'>
+                        <div className='flex gap-2'>
+                            <input value={commentText} onChange={(e) => setCommentText(e.target.value)} type="text" placeholder='Write a comment...' className='flex-1 p-2 text-sm border border-gray-200 rounded-md' />
+                            <button onClick={handleAddComment} className='px-3 py-2 text-xs rounded bg-indigo-500 hover:bg-indigo-600 text-white active:scale-95'>Send</button>
+                        </div>
+                        <div className='space-y-2'>
+                            {comments.map((c, idx) => (
+                                <div key={idx} className='flex items-start gap-2 text-sm'>
+                                    <span className='font-medium'>{c.user?.username || c.user}</span>
+                                    <span className='text-gray-600'>{c.text}</span>
+                                    <span className='text-gray-400 text-xs ml-auto'>{moment(c.createdAt).fromNow()}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
 

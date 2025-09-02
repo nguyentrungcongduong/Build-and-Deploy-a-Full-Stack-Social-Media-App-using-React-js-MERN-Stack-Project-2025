@@ -21,7 +21,19 @@ const Feed = () => {
       const { data } = await api.get('/api/post/feed', { headers: { Authorization: `Bearer ${await getToken()}` } })
 
       if (data.success) {
-        setFeeds(data.posts)
+        let posts = data.posts
+        try {
+          const redirectPostId = localStorage.getItem('redirectPostId')
+          if (redirectPostId) {
+            const idx = posts.findIndex(p => p._id === redirectPostId)
+            if (idx > -1) {
+              const highlighted = posts.splice(idx, 1)[0]
+              posts = [highlighted, ...posts]
+              localStorage.removeItem('redirectPostId')
+            }
+          }
+        } catch { }
+        setFeeds(posts)
       } else {
         toast.error(data.message)
       }
@@ -33,6 +45,8 @@ const Feed = () => {
 
   useEffect(() => {
     fetchFeeds()
+    const id = setInterval(fetchFeeds, 30000)
+    return () => clearInterval(id)
   }, [])
 
   return !loading ? (
@@ -42,7 +56,7 @@ const Feed = () => {
         <StoriesBar />
         <div className='p-4 space-y-6'>
           {feeds.filter(Boolean).map((post, index) => (
-            <PostCard key={post?._id || index} post={post} />
+            <PostCard key={post?._id || index} post={post} onLiked={fetchFeeds} />
           ))}
         </div>
       </div>

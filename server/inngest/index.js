@@ -10,14 +10,14 @@ export const inngest = new Inngest({ id: "my-app" });
 
 // Inngest Function to save user data to a database
 const syncUserCreation = inngest.createFunction(
-    {id: 'sync-user-from-clerk'},
-    {event: 'clerk/user.created'},
-    async ({event})=>{
-        const {id, first_name, last_name, email_addresses, image_url} = event.data
+    { id: 'sync-user-from-clerk' },
+    { event: 'clerk/user.created' },
+    async ({ event }) => {
+        const { id, first_name, last_name, email_addresses, image_url } = event.data
         let username = email_addresses[0].email_address.split('@')[0]
 
         // Check availability of username
-        const user = await User.findOne({username})
+        const user = await User.findOne({ username })
 
         if (user) {
             username = username + Math.floor(Math.random() * 10000)
@@ -31,43 +31,43 @@ const syncUserCreation = inngest.createFunction(
             username
         }
         await User.create(userData)
-        
+
     }
 )
 
 // Inngest Function to update user data in database 
 const syncUserUpdation = inngest.createFunction(
-    {id: 'update-user-from-clerk'},
-    {event: 'clerk/user.updated'},
-    async ({event})=>{
-        const {id, first_name, last_name, email_addresses, image_url} = event.data
-        
-    const updatedUserData = {
-        email:  email_addresses[0].email_address,
-        full_name: first_name + ' ' + last_name,
-        profile_picture: image_url
-    }
-    await User.findByIdAndUpdate(id, updatedUserData)
-        
+    { id: 'update-user-from-clerk' },
+    { event: 'clerk/user.updated' },
+    async ({ event }) => {
+        const { id, first_name, last_name, email_addresses, image_url } = event.data
+
+        const updatedUserData = {
+            email: email_addresses[0].email_address,
+            full_name: first_name + ' ' + last_name,
+            profile_picture: image_url
+        }
+        await User.findByIdAndUpdate(id, updatedUserData)
+
     }
 )
 
 // Inngest Function to delete user from database
 const syncUserDeletion = inngest.createFunction(
-    {id: 'delete-user-with-clerk'},
-    {event: 'clerk/user.deleted'},
-    async ({event})=>{
-        const {id} = event.data
+    { id: 'delete-user-with-clerk' },
+    { event: 'clerk/user.deleted' },
+    async ({ event }) => {
+        const { id } = event.data
         await User.findByIdAndDelete(id)
     }
 )
 
 // Inngest Function to send Reminder when a new connection request is added
 const sendNewConnectionRequestReminder = inngest.createFunction(
-    { id: "send-new-connection-request-reminder"},
-    {event: "app/connection-request"},
+    { id: "send-new-connection-request-reminder" },
+    { event: "app/connection-request" },
     async ({ event, step }) => {
-        const {connectionId} = event.data;
+        const { connectionId } = event.data;
 
         await step.run('send-connection-request-mail', async () => {
             const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id');
@@ -93,8 +93,8 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
         await step.run('send-connection-request-reminder', async () => {
             const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id');
 
-            if(connection.status === "accepted"){
-                return {message: "Already accepted"}
+            if (connection.status === "accepted") {
+                return { message: "Already accepted" }
             }
 
             const subject = `👋 New Connection Request`;
@@ -113,14 +113,14 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
                 body
             })
 
-            return {message: "Reminder sent."}
+            return { message: "Reminder sent." }
         })
     }
 )
 
 // Inngest Function to delete story after 24 hours
 const deleteStory = inngest.createFunction(
-    {id: 'story-delete'},
+    { id: 'story-delete' },
     { event: 'app/story.delete' },
     async ({ event, step }) => {
         const { storyId } = event.data;
@@ -134,13 +134,13 @@ const deleteStory = inngest.createFunction(
 )
 
 const sendNotificationOfUnseenMessages = inngest.createFunction(
-    {id: "send-unseen-messages-notification"},
-    {cron: "TZ=Asia/Ho_Chi_Minh 0 9 * * *"}, // Every Day 9 AM
-    async ({step}) => {
-        const messages = await Message.find({seen: false}).populate('to_user_id');
+    { id: "send-unseen-messages-notification" },
+    { cron: "TZ=Asia/Ho_Chi_Minh 0 9 * * *" }, // Every Day 9 AM
+    async ({ step }) => {
+        const messages = await Message.find({ seen: false }).populate('to_user_id');
         const unseenCount = {}
 
-        messages.map(message=> {
+        messages.map(message => {
             unseenCount[message.to_user_id._id] = (unseenCount[message.to_user_id._id] || 0) + 1;
         })
 
@@ -165,7 +165,7 @@ const sendNotificationOfUnseenMessages = inngest.createFunction(
                 body
             })
         }
-        return {message: "Notification sent."}
+        return { message: "Notification sent." }
     }
 )
 

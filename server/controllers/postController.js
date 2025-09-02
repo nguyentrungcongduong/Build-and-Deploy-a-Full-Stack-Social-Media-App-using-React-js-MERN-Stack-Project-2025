@@ -12,25 +12,25 @@ export const addPost = async (req, res) => {
 
         let image_urls = []
 
-        if(images.length){
+        if (images.length) {
             image_urls = await Promise.all(
                 images.map(async (image) => {
                     const fileBuffer = fs.readFileSync(image.path)
-                     const response = await imagekit.upload({
-                            file: fileBuffer,
-                            fileName: image.originalname,
-                            folder: "posts",
-                        })
+                    const response = await imagekit.upload({
+                        file: fileBuffer,
+                        fileName: image.originalname,
+                        folder: "posts",
+                    })
 
-                        const url = imagekit.url({
-                            path: response.filePath,
-                            transformation: [
-                                {quality: 'auto'},
-                                { format: 'webp' },
-                                { width: '1280' }
-                            ]
-                        })
-                        return url
+                    const url = imagekit.url({
+                        path: response.filePath,
+                        transformation: [
+                            { quality: 'auto' },
+                            { format: 'webp' },
+                            { width: '1280' }
+                        ]
+                    })
+                    return url
                 })
             )
         }
@@ -49,16 +49,16 @@ export const addPost = async (req, res) => {
 }
 
 // Get Posts
-export const getFeedPosts = async (req, res) =>{
+export const getFeedPosts = async (req, res) => {
     try {
         const { userId } = req.auth()
         const user = await User.findById(userId)
 
         // User connections and followings 
         const userIds = [userId, ...user.connections, ...user.following]
-        const posts = await Post.find({user: {$in: userIds}}).populate('user').sort({createdAt: -1});
+        const posts = await Post.find({ user: { $in: userIds } }).populate('user').sort({ createdAt: -1 });
 
-        res.json({ success: true, posts})
+        res.json({ success: true, posts })
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
@@ -66,18 +66,18 @@ export const getFeedPosts = async (req, res) =>{
 }
 
 // Like Post
-export const likePost = async (req, res) =>{
+export const likePost = async (req, res) => {
     try {
         const { userId } = req.auth()
         const { postId } = req.body;
 
         const post = await Post.findById(postId)
 
-        if(post.likes_count.includes(userId)){
+        if (post.likes_count.includes(userId)) {
             post.likes_count = post.likes_count.filter(user => user !== userId)
             await post.save()
             res.json({ success: true, message: 'Post unliked' });
-        }else{
+        } else {
             post.likes_count.push(userId)
             await post.save()
             res.json({ success: true, message: 'Post liked' });
@@ -86,5 +86,57 @@ export const likePost = async (req, res) =>{
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
+    }
+}
+
+// Add Comment
+export const addComment = async (req, res) => {
+    try {
+        const { userId } = req.auth()
+        const { postId, text } = req.body
+
+        if (!text || !text.trim()) {
+            return res.json({ success: false, message: 'Comment text is required' })
+        }
+
+        const post = await Post.findById(postId)
+        if (!post) {
+            return res.json({ success: false, message: 'Post not found' })
+        }
+
+        post.comments.push({ user: userId, text: text.trim() })
+        await post.save()
+
+        res.json({ success: true, message: 'Comment added', comments: post.comments })
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Get Public Post (no auth)
+export const getPublicPost = async (req, res) => {
+    try {
+        const { postId } = req.params
+        const post = await Post.findById(postId).populate('user').lean()
+        if (!post) {
+            return res.json({ success: false, message: 'Post not found' })
+        }
+        return res.json({ success: true, post })
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Get posts liked by a user
+export const getLikedPosts = async (req, res) => {
+    try {
+        const { userId } = req.params
+        const posts = await Post.find({ likes_count: userId }).populate('user').sort({ createdAt: -1 })
+        res.json({ success: true, posts })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
     }
 }
