@@ -12,17 +12,17 @@ const Feed = () => {
 
   const [feeds, setFeeds] = useState([])
   const [loading, setLoading] = useState(true)
-  const {getToken} = useAuth()
+  const { getToken } = useAuth()
 
 
   const fetchFeeds = async () => {
     try {
       setLoading(true)
-      const {data} = await api.get('/api/post/feed', {headers: { Authorization: `Bearer ${await getToken()}` }})
+      const { data } = await api.get('/api/post/feed', { headers: { Authorization: `Bearer ${await getToken()}` } })
 
-      if (data.success){
+      if (data.success) {
         setFeeds(data.posts)
-      }else{
+      } else {
         toast.error(data.message)
       }
     } catch (error) {
@@ -31,9 +31,9 @@ const Feed = () => {
     setLoading(false)
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchFeeds()
-  },[])
+  }, [])
 
   return !loading ? (
     <div className='h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8'>
@@ -41,8 +41,8 @@ const Feed = () => {
       <div>
         <StoriesBar />
         <div className='p-4 space-y-6'>
-          {feeds.map((post)=>(
-            <PostCard key={post._id} post={post}/>
+          {feeds.filter(Boolean).map((post, index) => (
+            <PostCard key={post?._id || index} post={post} />
           ))}
         </div>
       </div>
