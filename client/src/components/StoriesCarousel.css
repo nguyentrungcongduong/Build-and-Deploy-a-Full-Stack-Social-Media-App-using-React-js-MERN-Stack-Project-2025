@@ -1,0 +1,87 @@
+
+/* StoriesCarousel Animations */
+@keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  
+  .story-card {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .story-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  .view-count {
+    animation: pulse 2s infinite;
+  }
+  
+  .viewers-modal {
+    animation: fadeIn 0.2s ease-out;
+  }
+  
+  /* Carousel navigation */
+  .carousel-nav {
+    transition: all 0.3s ease;
+  }
+  
+  .carousel-nav:hover {
+    transform: scale(1.1);
+  }
+  
+  .carousel-nav:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Scrollbar styling */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .story-card {
+      min-width: 120px;
+      max-width: 120px;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .story-card {
+      min-width: 140px;
+      max-width: 140px;
+    }
+  }
+  

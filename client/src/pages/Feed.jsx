@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { assets } from '../assets/assets'
 import Loading from '../components/Loading.jsx'
 import StoriesBar from '../components/StoriesBar.jsx'
 import PostCard from '../components/PostCard.jsx'
@@ -7,6 +6,8 @@ import RecentMessages from '../components/RecentMessages.jsx'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
+import AdCarousel from '../components/AdCarousel.jsx'
+import StoriesCarousel from '../components/StoriesCarousel.jsx'
 
 const Feed = () => {
 
@@ -32,7 +33,9 @@ const Feed = () => {
               localStorage.removeItem('redirectPostId')
             }
           }
-        } catch { }
+        } catch {
+          // Ignore localStorage errors
+        }
         setFeeds(posts)
       } else {
         toast.error(data.message)
@@ -41,6 +44,18 @@ const Feed = () => {
       toast.error(error.message)
     }
     setLoading(false)
+  }
+
+  // Xử lý khi post được cập nhật
+  const handlePostUpdated = (updatedPost) => {
+    setFeeds(prev => prev.map(post =>
+      post._id === updatedPost._id ? updatedPost : post
+    ))
+  }
+
+  // Xử lý khi post được xóa
+  const handlePostDeleted = (deletedPostId) => {
+    setFeeds(prev => prev.filter(post => post._id !== deletedPostId))
   }
 
   useEffect(() => {
@@ -53,22 +68,23 @@ const Feed = () => {
     <div className='h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8'>
       {/* Stories and post list */}
       <div>
-        <StoriesBar />
+        <StoriesCarousel />
         <div className='p-4 space-y-6'>
           {feeds.filter(Boolean).map((post, index) => (
-            <PostCard key={post?._id || index} post={post} onLiked={fetchFeeds} />
+            <PostCard
+              key={post?._id || index}
+              post={post}
+              onLiked={fetchFeeds}
+              onPostUpdated={handlePostUpdated}
+              onPostDeleted={handlePostDeleted}
+            />
           ))}
         </div>
       </div>
 
       {/* Right Sidebar */}
       <div className='max-xl:hidden sticky top-0'>
-        <div className='max-w-xs bg-white text-xs p-4 rounded-md inline-flex flex-col gap-2 shadow'>
-          <h3 className='text-slate-800 font-semibold'>Sponsored</h3>
-          <img src={assets.sponsored_img} className='w-75 h-50 rounded-md' alt="" />
-          <p className='text-slate-600'>Email marketing</p>
-          <p className='text-slate-400'>Supercharge your marketing with a powerful, easy-to-use platform built for results.</p>
-        </div>
+        <AdCarousel></AdCarousel>
         <RecentMessages />
       </div>
     </div>

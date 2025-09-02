@@ -53,6 +53,22 @@ const Profile = () => {
     }
   }
 
+  // Xử lý khi post được cập nhật
+  const handlePostUpdated = (updatedPost) => {
+    setPosts(prev => prev.map(post =>
+      post._id === updatedPost._id ? updatedPost : post
+    ))
+    setLikedPosts(prev => prev.map(post =>
+      post._id === updatedPost._id ? updatedPost : post
+    ))
+  }
+
+  // Xử lý khi post được xóa
+  const handlePostDeleted = (deletedPostId) => {
+    setPosts(prev => prev.filter(post => post._id !== deletedPostId))
+    setLikedPosts(prev => prev.filter(post => post._id !== deletedPostId))
+  }
+
   useEffect(() => {
     if (profileId) {
       fetchUser(profileId)
@@ -88,7 +104,14 @@ const Profile = () => {
           {/* Posts */}
           {activeTab === 'posts' && (
             <div className='mt-6 flex flex-col items-center gap-6'>
-              {posts.map((post) => <PostCard key={post._id} post={post} />)}
+              {posts.map((post) => (
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  onPostUpdated={handlePostUpdated}
+                  onPostDeleted={handlePostDeleted}
+                />
+              ))}
             </div>
           )}
 
@@ -112,7 +135,14 @@ const Profile = () => {
           {/* Likes */}
           {activeTab === 'likes' && (
             <div className='mt-6 flex flex-col items-center gap-6'>
-              {likedPosts.map((post) => <PostCard key={post._id} post={post} />)}
+              {likedPosts.map((post) => (
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  onPostUpdated={handlePostUpdated}
+                  onPostDeleted={handlePostDeleted}
+                />
+              ))}
             </div>
           )}
 
