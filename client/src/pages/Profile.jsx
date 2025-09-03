@@ -10,7 +10,7 @@ import { useAuth } from '@clerk/clerk-react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
-
+import PostCardOptimized from '../components/PostCardOptimized.jsx'
 const Profile = () => {
 
   const currentUser = useSelector((state) => state.user.value)
@@ -105,7 +105,7 @@ const Profile = () => {
           {activeTab === 'posts' && (
             <div className='mt-6 flex flex-col items-center gap-6'>
               {posts.map((post) => (
-                <PostCard
+                <PostCardOptimized
                   key={post._id}
                   post={post}
                   onPostUpdated={handlePostUpdated}
@@ -117,19 +117,37 @@ const Profile = () => {
 
           {/* Media */}
           {activeTab === 'media' && (
-            <div className='flex flex-wrap mt-6 max-w-6xl'>
-              {
-                posts.filter((post) => post.image_urls.length > 0).map((post) => (
-                  <>
-                    {post.image_urls.map((image, index) => (
-                      <Link target='_blank' to={image} key={index} className='relative group'>
-                        <img src={image} key={index} className='w-64 aspect-video object-cover' alt="" />
-                        <p className='absolute bottom-0 right-0 text-xs p-1 px-3 backdrop-blur-xl text-white opacity-0 group-hover:opacity-100 transition duration-300'>Posted {moment(post.createdAt).fromNow()}</p>
-                      </Link>
-                    ))}
-                  </>
-                ))
-              }
+            <div className='flex flex-wrap mt-6 max-w-6xl gap-2'>
+              {/* Images */}
+              {posts.filter((post) => post.image_urls?.length > 0).map((post) => (
+                <React.Fragment key={post._id}>
+                  {post.image_urls.map((image, index) => (
+                    <Link target='_blank' to={image} key={`img-${post._id}-${index}`} className='relative group'>
+                      <img src={image} className='w-64 aspect-video object-cover rounded-lg' alt="" />
+                      <p className='absolute bottom-0 right-0 text-xs p-1 px-3 backdrop-blur-xl text-white opacity-0 group-hover:opacity-100 transition duration-300'>Posted {moment(post.createdAt).fromNow()}</p>
+                    </Link>
+                  ))}
+                </React.Fragment>
+              ))}
+
+              {/* Videos */}
+              {posts.filter((post) => post.video_urls?.length > 0).map((post) => (
+                <React.Fragment key={post._id}>
+                  {post.video_urls.map((video, index) => (
+                    <Link target='_blank' to={video} key={`video-${post._id}-${index}`} className='relative group'>
+                      <div className='w-64 aspect-video bg-gray-100 rounded-lg flex items-center justify-center'>
+                        <video src={video} className='w-full h-full object-cover rounded-lg' />
+                        <div className='absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center'>
+                          <div className='w-16 h-16 bg-white/80 rounded-full flex items-center justify-center'>
+                            <span className='text-2xl'>▶️</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className='absolute bottom-0 right-0 text-xs p-1 px-3 backdrop-blur-xl text-white opacity-0 group-hover:opacity-100 transition duration-300'>Posted {moment(post.createdAt).fromNow()}</p>
+                    </Link>
+                  ))}
+                </React.Fragment>
+              ))}
             </div>
           )}
           {/* Likes */}

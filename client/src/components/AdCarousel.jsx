@@ -5,6 +5,8 @@ import { adData, carouselConfig } from '../data/adData.js'
 const AdCarousel = () => {
     const [currentAd, setCurrentAd] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
+    const [imageErrors, setImageErrors] = useState({})
+    const [imageLoading, setImageLoading] = useState({})
     const intervalRef = useRef(null)
 
     const ads = adData
@@ -39,6 +41,38 @@ const AdCarousel = () => {
         setIsPaused(!isPaused)
     }
 
+    // Xử lý khi ảnh bị lỗi
+    const handleImageError = (adId) => {
+        setImageErrors(prev => ({ ...prev, [adId]: true }))
+    }
+
+    // Xử lý khi ảnh load thành công
+    const handleImageLoad = (adId) => {
+        setImageLoading(prev => ({ ...prev, [adId]: false }))
+    }
+
+    // Xử lý khi ảnh bắt đầu load
+    const handleImageLoadStart = (adId) => {
+        setImageLoading(prev => ({ ...prev, [adId]: true }))
+    }
+
+    // Icon cho từng category (fallback)
+    const getCategoryIcon = (category) => {
+        const icons = {
+            ecommerce: '🛍️',
+            transport: '🚗',
+            automotive: '🚙',
+            books: '📚',
+            banking: '🏦',
+            telecom: '📱',
+            travel: '✈️',
+            food: '☕',
+            realestate: '🏠',
+            education: '🎓'
+        }
+        return icons[category] || '📢'
+    }
+
     return (
         <div className='max-xl:hidden sticky top-0 ad-carousel'>
             <div className='max-w-xs bg-white text-xs p-4 rounded-md shadow ad-carousel-enter'>
@@ -64,7 +98,7 @@ const AdCarousel = () => {
                             transitionDuration: `${carouselConfig.transitionDuration}ms`
                         }}
                     >
-                        {ads.map((ad, index) => (
+                        {ads.map((ad) => (
                             <div
                                 key={ad.id}
                                 className='w-full flex-shrink-0 cursor-pointer transform hover:scale-105 transition-transform duration-300'
@@ -78,12 +112,53 @@ const AdCarousel = () => {
                                         </span>
                                     </div>
 
-                                    <img
-                                        src={ad.image}
-                                        className='w-full h-32 object-cover rounded-md mb-3'
-                                        alt={ad.title}
-                                        loading="lazy"
-                                    />
+                                    {/* Ảnh quảng cáo với fallback */}
+                                    <div className='w-full h-32 rounded-md mb-3 flex items-center justify-center relative'>
+                                        {!imageErrors[ad.id] ? (
+                                            <>
+                                                {/* Loading state */}
+                                                {imageLoading[ad.id] && (
+                                                    <div className='absolute inset-0 bg-white bg-opacity-20 rounded-md flex items-center justify-center'>
+                                                        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-white'></div>
+                                                    </div>
+                                                )}
+
+                                                {/* Ảnh chính */}
+                                                <img
+                                                    src={ad.image}
+                                                    className='w-full h-full object-cover rounded-md'
+                                                    alt={ad.title}
+                                                    loading="lazy"
+                                                    onLoadStart={() => handleImageLoadStart(ad.id)}
+                                                    onLoad={() => handleImageLoad(ad.id)}
+                                                    onError={() => handleImageError(ad.id)}
+                                                />
+                                            </>
+                                        ) : (
+                                            /* Fallback với ảnh dự phòng */
+                                            <img
+                                                src={ad.fallbackImage}
+                                                className='w-full h-full object-cover rounded-md'
+                                                alt={ad.title}
+                                                loading="lazy"
+                                                onError={() => {
+                                                    // Nếu cả ảnh dự phòng cũng lỗi, hiển thị icon
+                                                    setImageErrors(prev => ({ ...prev, [ad.id]: 'final' }))
+                                                }}
+                                            />
+                                        )}
+
+                                        {/* Fallback cuối cùng với icon */}
+                                        {imageErrors[ad.id] === 'final' && (
+                                            <div className='absolute inset-0 bg-white bg-opacity-20 rounded-md flex items-center justify-center'>
+                                                <div className='text-center'>
+                                                    <div className='text-4xl mb-2'>{getCategoryIcon(ad.category)}</div>
+                                                    <div className='text-xs opacity-75'>Sponsored Content</div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <h4 className='font-semibold text-sm mb-1'>{ad.title}</h4>
                                     <p className='text-xs opacity-90'>{ad.description}</p>
                                 </div>
@@ -100,8 +175,8 @@ const AdCarousel = () => {
                                 key={index}
                                 onClick={() => goToAd(index)}
                                 className={`w-2 h-2 rounded-full dot ${index === currentAd
-                                        ? 'bg-indigo-500 active'
-                                        : 'bg-gray-300 hover:bg-gray-400'
+                                    ? 'bg-indigo-500 active'
+                                    : 'bg-gray-300 hover:bg-gray-400'
                                     }`}
                             />
                         ))}

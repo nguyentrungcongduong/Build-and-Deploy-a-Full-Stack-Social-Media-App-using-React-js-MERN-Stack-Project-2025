@@ -443,7 +443,7 @@ const ChatBox = () => {
 
       // Hiện nút scroll up khi user ở gần đáy (để load tin nhắn cũ hơn)
       // distanceFromBottom < 100 && distanceFromTop > 300
-      setShowScrollUp(scrollTop > 50)
+      setShowScrollUp(distanceFromBottom < 100 && distanceFromTop > 300)
 
       // Hiện nút scroll down khi user ở trên cao (để nhảy về tin nhắn mới nhất)
       setShowScrollDown(distanceFromBottom > 100)

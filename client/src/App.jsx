@@ -33,13 +33,12 @@ const App = () => {
         const token = await getToken()
         dispatch(fetchUser(token))
         dispatch(fetchConnections(token))
+
+        // Chỉ redirect về trang chủ nếu có redirectPostId, không xóa ngay
         try {
           const redirectPostId = localStorage.getItem('redirectPostId')
-          if (redirectPostId) {
-            localStorage.removeItem('redirectPostId')
-            if (pathname !== '/') {
-              window.history.replaceState({}, '', '/')
-            }
+          if (redirectPostId && pathname !== '/') {
+            window.history.replaceState({}, '', '/')
           }
         } catch { /* ignore */ }
       }

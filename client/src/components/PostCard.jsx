@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { BadgeCheck, Heart, MessageCircle, MoveVertical, Share2, X, Trash2 } from 'lucide-react'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
@@ -14,6 +14,7 @@ const PostCard = ({ post, onLiked, requireAuth = false, onPostUpdated, onPostDel
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
     const [editContent, setEditContent] = useState('')
     const [editImages, setEditImages] = useState([])
+    const [editVideos, setEditVideos] = useState([])
     const [isEditing, setIsEditing] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
 
@@ -32,21 +33,22 @@ const PostCard = ({ post, onLiked, requireAuth = false, onPostUpdated, onPostDel
     const isPostOwner = currentUser?._id === post?.user?._id
 
     // Mở modal chỉnh sửa
-    const openEditModal = () => {
+    const openEditModal = useCallback(() => {
         setEditContent(post?.content || '')
         setEditImages([])
+        setEditVideos([])
         setEditModalOpen(true)
         setMenuOpen(false)
-    }
+    }, [post?.content])
 
     // Mở modal xác nhận xóa
-    const openDeleteConfirm = () => {
+    const openDeleteConfirm = useCallback(() => {
         setDeleteConfirmOpen(true)
         setMenuOpen(false)
-    }
+    }, [])
 
     // Xử lý chỉnh sửa post
-    const handleEditPost = async () => {
+    const handleEditPost = useCallback(async () => {
         if (!post?._id) return
 
         const content = editContent.trim()
@@ -63,6 +65,11 @@ const PostCard = ({ post, onLiked, requireAuth = false, onPostUpdated, onPostDel
             // Thêm ảnh mới nếu có
             editImages.forEach((image) => {
                 formData.append('images', image)
+            })
+
+            // Thêm video mới nếu có
+            editVideos.forEach((video) => {
+                formData.append('videos', video)
             })
 
             const { data } = await api.put(`/api/post/${post._id}`, formData, {
@@ -85,10 +92,10 @@ const PostCard = ({ post, onLiked, requireAuth = false, onPostUpdated, onPostDel
         } finally {
             setIsEditing(false)
         }
-    }
+    }, [post?._id, editContent, editImages, editVideos, getToken, onPostUpdated])
 
     // Xử lý xóa post
-    const handleDeletePost = async () => {
+    const handleDeletePost = useCallback(async () => {
         if (!post?._id) return
 
         setIsDeleting(true)
@@ -110,12 +117,12 @@ const PostCard = ({ post, onLiked, requireAuth = false, onPostUpdated, onPostDel
         } finally {
             setIsDeleting(false)
         }
-    }
+    }, [post?._id, getToken, onPostDeleted])
 
     const handleLike = async () => {
         if (!post?._id) return
         if (requireAuth && !isSignedIn) {
-            toast.error('Please log in to like this post')
+            toast.error('Vui lòng đăng nhập để thích bài viết này. Bài viết sẽ được hiển thị ở trang chủ của bạn sau khi đăng nhập.')
             try { localStorage.setItem('redirectPostId', post._id) } catch { /* ignore */ }
             navigate('/')
             return
@@ -147,7 +154,7 @@ const PostCard = ({ post, onLiked, requireAuth = false, onPostUpdated, onPostDel
 
     const handleAddComment = async () => {
         if (requireAuth && !isSignedIn) {
-            toast.error('Please log in to comment')
+            toast.error('Vui lòng đăng nhập để bình luận. Bài viết sẽ được hiển thị ở trang chủ của bạn sau khi đăng nhập.')
             try { localStorage.setItem('redirectPostId', post._id) } catch { /* ignore */ }
             navigate('/')
             return
@@ -360,18 +367,45 @@ const PostCard = ({ post, onLiked, requireAuth = false, onPostUpdated, onPostDel
                 />
             )}
 
-            {/* Images */}
-            <div className='grid grid-cols-2 gap-2'>
-                {(post?.image_urls || []).map((img, index) => (
-                    <img
-                        src={img}
-                        key={index}
-                        className={`w-full h-48 object-cover rounded-lg ${(post?.image_urls || []).length === 1 && 'col-span-2 h-auto'
-                            }`}
-                        alt=""
-                    />
-                ))}
-            </div>
+            {/* Media (Images & Videos) */}
+            {(post?.image_urls?.length > 0 || post?.video_urls?.length > 0) && (
+                <div className='space-y-3'>
+                    {/* Images */}
+                    {post?.image_urls?.length > 0 && (
+                        <div className='grid grid-cols-2 gap-2'>
+                            {post.image_urls.map((img, index) => (
+                                <img
+                                    src={img}
+                                    key={`img-${index}`}
+                                    className={`w-full h-48 object-cover rounded-lg ${post.image_urls.length === 1 && 'col-span-2 h-auto'}`}
+                                    alt=""
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Videos */}
+                    {post?.video_urls?.length > 0 && (
+                        <div className='space-y-2'>
+                            {post.video_urls.map((video, index) => (
+                                <div key={`video-${index}`} className='relative'>
+                                    <video
+                                        src={video}
+                                        controls
+                                        className='w-full h-64 object-cover rounded-lg'
+                                        poster={video.replace('.mp4', '.jpg')} // Fallback poster
+                                    >
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div className='absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded'>
+                                        Video
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Actions */}
             <div className='flex items-center gap-4 text-gray-600 text-sm pt-2 border-t border-gray-300'>

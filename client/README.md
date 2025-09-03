@@ -1,12 +1,67 @@
-# React + Vite
+# Social Media App - React + MERN Stack
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack social media application built with React.js and MERN stack.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- User authentication and authorization
+- Create, edit, and delete posts
+- Like and comment on posts
+- User profiles and connections
+- Real-time messaging
+- Post sharing and discovery
+- **Optimized Performance** - Instant like/comment updates
 
-## Expanding the ESLint configuration
+## Performance Improvements
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This app includes advanced performance optimizations:
+
+- **Optimistic Updates**: UI updates instantly without waiting for API responses
+- **Memoization**: Uses React.useCallback and useMemo for optimal rendering
+- **Instant Feedback**: Like and comment actions are immediate
+- **Smooth UX**: No more lag when interacting with posts
+
+See [README_PERFORMANCE.md](./README_PERFORMANCE.md) for detailed performance analysis.
+
+## Post Share Feature
+
+Enhanced post sharing with automatic redirect after login:
+
+- Share posts via public URLs
+- Automatic post highlighting in feed after login
+- Seamless user experience
+
+See [README_POST_SHARE.md](./README_POST_SHARE.md) for implementation details.
+
+## Tech Stack
+
+- **Frontend**: React.js, Redux Toolkit, Tailwind CSS
+- **Backend**: Node.js, Express.js, MongoDB
+- **Authentication**: Clerk
+- **Real-time**: Server-Sent Events (SSE)
+
+## Getting Started
+
+1. Install dependencies: `npm install`
+2. Set up environment variables
+3. Run development server: `npm run dev`
+
+## Performance Testing
+
+Use React DevTools Profiler to monitor performance improvements:
+
+```bash
+# Install React DevTools
+npm install -g react-devtools
+
+# Run profiler
+react-devtools
+```
+
+## Contributing
+
+Follow performance best practices:
+- Use optimistic updates for user actions
+- Memoize expensive calculations
+- Avoid unnecessary re-renders
+- Implement proper error handling with fallbacks
