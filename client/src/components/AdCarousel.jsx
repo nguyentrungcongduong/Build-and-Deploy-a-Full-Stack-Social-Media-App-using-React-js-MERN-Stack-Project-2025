@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import './AdCarousel.css'
+import './adCarousel.css'
 import { adData, carouselConfig } from '../data/adData.js'
 
 const AdCarousel = () => {
