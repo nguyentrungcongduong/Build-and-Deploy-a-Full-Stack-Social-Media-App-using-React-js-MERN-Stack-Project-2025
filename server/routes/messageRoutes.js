@@ -7,7 +7,8 @@ import { protect } from '../middlewares/auth.js';
 const messageRouter = express.Router();
 
 messageRouter.get('/:userId', sseController)
-messageRouter.post('/send', upload.single('image', 4), protect, sendMessage)
+// Auth first, then parse multipart form (single image file)
+messageRouter.post('/send', protect, upload.single('image'), sendMessage)
 messageRouter.post('/get', protect, getChatMessages)
 
 export default messageRouter
