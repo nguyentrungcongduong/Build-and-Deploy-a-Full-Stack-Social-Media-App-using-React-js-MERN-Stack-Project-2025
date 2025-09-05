@@ -73,16 +73,22 @@ import User from "../models/User.js";
 import { inngest } from "../inngest/index.js";
 
 // Add User Story
-export const addUserStory = async (req, res) =>{
+export const addUserStory = async (req, res) => {
     try {
         const { userId } = req.auth();
-        const {content, media_type, background_color} = req.body;
+        const { content, media_type, background_color } = req.body;
         const media = req.file
         let media_url = ''
 
         // upload media to imagekit
-        if(media_type === 'image' || media_type === 'video'){
-            const fileBuffer = fs.readFileSync(media.path)
+        if (media_type === 'image' || media_type === 'video') {
+            if (!media) {
+                throw new Error('Media is required for image/video story')
+            }
+            const fileBuffer = media.buffer || (media.path ? fs.readFileSync(media.path) : null)
+            if (!fileBuffer) {
+                throw new Error('Uploaded media buffer not found')
+            }
             const response = await imagekit.upload({
                 file: fileBuffer,
                 fileName: media.originalname,
@@ -104,16 +110,16 @@ export const addUserStory = async (req, res) =>{
             data: { storyId: story._id }
         })
 
-        res.json({success: true})
+        res.json({ success: true })
 
     } catch (error) {
-       console.log(error);
-       res.json({ success: false, message: error.message }); 
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
 }
 
 // Get User Stories
-export const getStories = async (req, res) =>{
+export const getStories = async (req, res) => {
     try {
         const { userId } = req.auth();
         const user = await User.findById(userId)
@@ -122,13 +128,13 @@ export const getStories = async (req, res) =>{
         const userIds = [userId, ...user.connections, ...user.following]
 
         const stories = await Story.find({
-            user: {$in: userIds}
+            user: { $in: userIds }
         }).populate('user').populate('views.user').sort({ createdAt: -1 });
 
-        res.json({ success: true, stories }); 
+        res.json({ success: true, stories });
     } catch (error) {
-       console.log(error);
-       res.json({ success: false, message: error.message }); 
+        console.log(error);
+        res.json({ success: false, message: error.message });
     }
 }
 

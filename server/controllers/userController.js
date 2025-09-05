@@ -82,7 +82,10 @@ export const updateUserData = async (req, res) => {
         const cover = req.files.cover && req.files.cover[0]
 
         if (profile) {
-            const buffer = fs.readFileSync(profile.path)
+            const buffer = profile.buffer || (profile.path ? fs.readFileSync(profile.path) : null)
+            if (!buffer) {
+                throw new Error('Uploaded profile image buffer not found')
+            }
             const response = await imagekit.upload({
                 file: buffer,
                 fileName: profile.originalname,
@@ -103,7 +106,10 @@ export const updateUserData = async (req, res) => {
         }
 
         if (cover) {
-            const buffer = fs.readFileSync(cover.path)
+            const buffer = cover.buffer || (cover.path ? fs.readFileSync(cover.path) : null)
+            if (!buffer) {
+                throw new Error('Uploaded cover image buffer not found')
+            }
             const response = await imagekit.upload({
                 file: buffer,
                 fileName: cover.originalname,

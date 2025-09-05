@@ -157,7 +157,10 @@ export const sendMessage = async (req, res) => {
         let message_type = image ? 'image' : 'text';
 
         if (message_type === 'image') {
-            const fileBuffer = fs.readFileSync(image.path);
+            const fileBuffer = image.buffer || (image.path ? fs.readFileSync(image.path) : null)
+            if (!fileBuffer) {
+                throw new Error('Uploaded image buffer not found')
+            }
             const response = await imagekit.upload({
                 file: fileBuffer,
                 fileName: image.originalname,
@@ -195,7 +198,7 @@ export const sendMessage = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        
+
         res.json({ success: false, message: error.message });
     }
 }

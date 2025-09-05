@@ -21,7 +21,8 @@ import { addUserStory, getStories, viewStory } from '../controllers/storyControl
 
 const storyRouter = express.Router()
 
-storyRouter.post('/create', upload.single('media'), protect, addUserStory)
+// Auth first before parsing multipart data
+storyRouter.post('/create', protect, upload.single('media'), addUserStory)
 storyRouter.get('/get', protect, getStories)
 storyRouter.post('/view', protect, viewStory)
 

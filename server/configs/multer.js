@@ -100,22 +100,9 @@
 
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 
-// Ensure uploads directory exists
-const uploadsDir = 'uploads';
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir + '/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
-    }
-});
+// Use memory storage for serverless compatibility (no local filesystem writes)
+const storage = multer.memoryStorage();
 
 // const fileFilter = (req, file, cb) => {
 //     // Allow images and videos
@@ -127,11 +114,11 @@ const storage = multer.diskStorage({
 // };
 
 const fileFilter = (req, file, cb) => {
-    // Allow only images
-    if (file.mimetype.startsWith('image/')) {
+    // Allow images and videos for broader media support (stories, posts)
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
         cb(null, true);
     } else {
-        cb(new Error('Only image files are allowed!'), false);
+        cb(new Error('Only image and video files are allowed!'), false);
     }
 };
 

@@ -249,7 +249,7 @@ export const addPost = async (req, res) => {
         console.log('=== ADD POST REQUEST ===')
         console.log('Body:', req.body)
         console.log('Files:', req.files)
-        
+
         const { userId } = req.auth();
         const { content, post_type } = req.body;
         const images = req.files
@@ -262,13 +262,13 @@ export const addPost = async (req, res) => {
                 images.map(async (file) => {
                     try {
                         console.log(`Processing file: ${file.originalname}, path: ${file.path}, mimetype: ${file.mimetype}`)
-                        
-                        if (!fs.existsSync(file.path)) {
-                            throw new Error(`File not found: ${file.path}`)
+
+                        // With memoryStorage, file.buffer is available directly
+                        const fileBuffer = file.buffer || (file.path ? fs.readFileSync(file.path) : null)
+                        if (!fileBuffer) {
+                            throw new Error('Uploaded file buffer not found')
                         }
-                        
-                        const fileBuffer = fs.readFileSync(file.path)
-                        
+
                         // Configure upload parameters based on file type
                         const uploadParams = {
                             file: fileBuffer,
@@ -338,7 +338,7 @@ export const addPost = async (req, res) => {
             image_urls,
             post_type: finalPostType
         })
-        
+
         console.log('Post created successfully')
         res.json({ success: true, message: "Post created successfully" });
     } catch (error) {
@@ -469,8 +469,11 @@ export const updatePost = async (req, res) => {
             image_urls = await Promise.all(
                 images.map(async (file) => {
                     try {
-                        const fileBuffer = fs.readFileSync(file.path)
-                        
+                        const fileBuffer = file.buffer || (file.path ? fs.readFileSync(file.path) : null)
+                        if (!fileBuffer) {
+                            throw new Error('Uploaded file buffer not found')
+                        }
+
                         // Configure upload parameters based on file type
                         const uploadParams = {
                             file: fileBuffer,
